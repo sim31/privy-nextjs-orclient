@@ -19,7 +19,10 @@
     "noImplicitReturns": false,
     "noPropertyAccessFromIndexSignature": false,
     "exactOptionalPropertyTypes": false,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "paths": {
+      "ethers": ["./node_modules/ethers/lib.commonjs/index.d.ts"]
+    }                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
   "exclude": ["node_modules"]
