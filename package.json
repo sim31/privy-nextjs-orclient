@@ -19,8 +19,8 @@
     "@tailwindcss/forms": "^0.5.3",
     "ethers": "^6.13.3",
     "next": "latest",
-    "orclient": "file:../../orclient",
-    "ortypes": "file:../../ortypes",
+    "@ordao/orclient": "^1.0.0",
+    "@ordao/ortypes": "^1.0.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
