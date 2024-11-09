@@ -1,7 +1,10 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { getAccessToken, usePrivy } from "@privy-io/react-auth";
+import { useEffect, useMemo, useState } from "react";
+import { getAccessToken, usePrivy, useWallets } from "@privy-io/react-auth";
 import Head from "next/head";
+import { createOrclient } from "./createOrclient";
+import { hexlify, randomBytes } from "ethers";
+// import { RespectBreakoutRequest } from "@ordao/ortypes/dist/orclient";
 
 async function verifyToken() {
   const url = "/api/verify";
@@ -50,9 +53,58 @@ export default function DashboardPage() {
   const phone = user?.phone;
   const wallet = user?.wallet;
 
+  const conWallets = useWallets();
+  // TODO: Is this the right way to select a wallet?
+  const userWallet = useMemo(() =>{
+    if (conWallets) {
+      return conWallets.wallets.find(w => w.address === wallet?.address);
+    }
+  }, [wallet]);
+
   const googleSubject = user?.google?.subject || null;
   const twitterSubject = user?.twitter?.subject || null;
   const discordSubject = user?.discord?.subject || null;
+
+  async function makeOrecProposal() {
+    console.log("click");
+    if (userWallet) {
+      // TODO: orclient should be created once in app or whenever a wallet changes,
+      // instead creating it on each click here
+      // Should probably create a react hook.
+      console.log("Creating ORClient");
+      const c = await createOrclient(userWallet);
+      console.log("Vote length (s): ", await c.getVoteLength());
+      console.log("Making a proposal");
+      // TODO: should only show completion to the user after this function completes
+      // After privy shows "all done" when using embeded wallet, it still has to make one request
+      // to store a proposal.
+      await c.proposeCustomSignal({
+        signalType: 1,
+        data: hexlify(randomBytes(2))
+      });
+      console.log("done");
+
+      // Example: breakout result submission
+      // const req: RespectBreakoutRequest = {
+      //   groupNum: 1,
+      //   meetingNum: 10,
+      //   rankings: [
+      //     "0x8319C20eF4Dd5f08b34957B29BA5Ce5F19a50Ef2",
+      //     "0x0806dF7DCB21B50EFfd790c105Ee57E58F76379e",
+      //     "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+      //   ]
+      // }
+      // await c.proposeBreakoutResult(req);
+
+      // TODO: Why is does typechecker not complain here in vscode?
+      // await c.proposeBreakoutResult({
+      //   groupNum: 1,
+      // })
+      console.log("done");
+    } else {
+      console.log("wallet not ready");
+    }
+  }
 
   return (
     <>
@@ -198,6 +250,12 @@ export default function DashboardPage() {
                 Verify token on server
               </button>
 
+              <button
+                onClick={makeOrecProposal}
+                className="text-sm bg-violet-600 hover:bg-violet-700 py-2 px-4 rounded-md text-white border-none"
+              >
+                Make Orec Proposal
+              </button>
               {Boolean(verifyResult) && (
                 <details className="w-full">
                   <summary className="mt-6 font-bold uppercase text-sm text-gray-600">
