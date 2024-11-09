@@ -32,11 +32,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
 
 export default function LoginPage() {
   const router = useRouter();
-
   const { login } = useLogin({
-    onComplete: async () => {
-      router.push("/dashboard")
-    }
+    onComplete: () => router.push("/dashboard"),
   });
 
   return (
