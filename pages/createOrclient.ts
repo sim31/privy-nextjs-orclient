@@ -2,8 +2,8 @@
 // import { ORClient } from "orclient";
 // import { ORContext, ConfigWithOrnode } from "ortypes/orContext.js";
 // import { config } from "./config.js"
-import { ORContext } from "@ordao/ortypes";
-import { RemoteOrnode, ORClient } from "@ordao/orclient";
+import { ORContext } from "ortypes";
+import { RemoteOrnode, ORClient } from "orclient";
 import { BrowserProvider } from "ethers";
 import { ConnectedWallet } from "@privy-io/react-auth";
 
