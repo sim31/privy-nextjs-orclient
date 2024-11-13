@@ -4,7 +4,7 @@ import { getAccessToken, usePrivy, useWallets } from "@privy-io/react-auth";
 import Head from "next/head";
 import { createOrclient } from "./createOrclient";
 import { hexlify, randomBytes } from "ethers";
-// import { RespectBreakoutRequest } from "@ordao/ortypes/dist/orclient";
+import { RespectBreakoutRequest } from "@ordao/ortypes/orclient.js";
 
 async function verifyToken() {
   const url = "/api/verify";
