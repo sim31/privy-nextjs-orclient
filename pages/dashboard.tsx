@@ -2,9 +2,9 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { getAccessToken, usePrivy, useWallets } from "@privy-io/react-auth";
 import Head from "next/head";
-import { createOrclient } from "./createOrclient";
+import { createOrclient } from "../lib/createOrclient";
 import { hexlify, randomBytes } from "ethers";
-import { RespectBreakoutRequest } from "@ordao/ortypes/orclient.js";
+// import { RespectBreakoutRequest } from "@ordao/ortypes/orclient.js";
 
 async function verifyToken() {
   const url = "/api/verify";
