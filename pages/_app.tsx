@@ -44,7 +44,9 @@ function MyApp({ Component, pageProps }: AppProps) {
         appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""}
         config={{
           embeddedWallets: {
-            createOnLogin: "all-users",
+            // IMPORTANT: use this option if you don't want to deal with multiple wallets per user account
+            // and you want to prefer external wallet if user has one.
+            createOnLogin: "users-without-wallets",
           },
         }}
       >
