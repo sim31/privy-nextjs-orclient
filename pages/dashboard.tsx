@@ -2,9 +2,8 @@ import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { getAccessToken, usePrivy, useWallets } from "@privy-io/react-auth";
 import Head from "next/head";
-import { createOrclient } from "../lib/createOrclient";
 import { hexlify, randomBytes } from "ethers";
-// import { RespectBreakoutRequest } from "@ordao/ortypes/orclient.js";
+import { useOrclient } from "@ordao/privy-react-orclient";
 
 async function verifyToken() {
   const url = "/api/verify";
@@ -56,53 +55,54 @@ export default function DashboardPage() {
   const conWallets = useWallets();
   // TODO: Is this the right way to select a wallet?
   const userWallet = useMemo(() =>{
-    if (conWallets) {
+    if (conWallets && conWallets.ready) {
       return conWallets.wallets.find(w => w.address === wallet?.address);
     }
   }, [wallet]);
+
+  const orclient = useOrclient("op-sepolia-1", userWallet);
 
   const googleSubject = user?.google?.subject || null;
   const twitterSubject = user?.twitter?.subject || null;
   const discordSubject = user?.discord?.subject || null;
 
+  async function getPeriodLengths() {
+    if (orclient) {
+      console.log("Vote length (s): ", await orclient.getVoteLength());
+      console.log("Veto length (s): ", await orclient.getVetoLength());
+    }
+  }
+
   async function makeOrecProposal() {
     console.log("click");
-    if (userWallet) {
-      // TODO: orclient should be created once in app or whenever a wallet changes,
-      // instead creating it on each click here
-      // Should probably create a react hook.
-      console.log("Creating ORClient");
-      const c = await createOrclient(userWallet);
-      console.log("Vote length (s): ", await c.getVoteLength());
+    if (orclient) {
       console.log("Making a proposal");
-      // TODO: should only show completion to the user after this function completes
-      // After privy shows "all done" when using embeded wallet, it still has to make one request
-      // to store a proposal.
-      await c.proposeCustomSignal({
-        signalType: 1,
-        data: hexlify(randomBytes(2))
+
+      // This request object has to be the same for all participants of a breakout room.
+      await orclient.proposeBreakoutResult({
+        groupNum: 1,
+        meetingNum: 10,
+        rankings: [
+          "0x8319C20eF4Dd5f08b34957B29BA5Ce5F19a50Ef2",
+          "0x0806dF7DCB21B50EFfd790c105Ee57E58F76379e",
+          "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+        ],
+        // Metadata field is optional.
+        metadata: {
+          // Could use this to provide names for each rank
+          propDescription: hexlify(randomBytes(8))
+        }
       });
+
+      // await orclient.proposeCustomSignal({
+      //   signalType: 1,
+      //   data: hexlify(randomBytes(2))
+      // });
+
       console.log("done");
 
-      // Example: breakout result submission
-      // const req: RespectBreakoutRequest = {
-      //   groupNum: 1,
-      //   meetingNum: 10,
-      //   rankings: [
-      //     "0x8319C20eF4Dd5f08b34957B29BA5Ce5F19a50Ef2",
-      //     "0x0806dF7DCB21B50EFfd790c105Ee57E58F76379e",
-      //     "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
-      //   ]
-      // }
-      // await c.proposeBreakoutResult(req);
-
-      // TODO: Why is does typechecker not complain here in vscode?
-      // await c.proposeBreakoutResult({
-      //   groupNum: 1,
-      // })
-      console.log("done");
     } else {
-      console.log("wallet not ready");
+      console.log("orclient not ready");
     }
   }
 
@@ -255,6 +255,13 @@ export default function DashboardPage() {
                 className="text-sm bg-violet-600 hover:bg-violet-700 py-2 px-4 rounded-md text-white border-none"
               >
                 Make Orec Proposal
+              </button>
+
+              <button
+                onClick={getPeriodLengths}
+                className="text-sm bg-violet-600 hover:bg-violet-700 py-2 px-4 rounded-md text-white border-none"
+              >
+                Orclient period lengths
               </button>
               {Boolean(verifyResult) && (
                 <details className="w-full">
