@@ -60,7 +60,7 @@ export default function DashboardPage() {
     }
   }, [wallet]);
 
-  const orclient = useOrclient("op-sepolia-1", userWallet);
+  const orclient = useOrclient("op-sepolia", userWallet);
 
   const googleSubject = user?.google?.subject || null;
   const twitterSubject = user?.twitter?.subject || null;
