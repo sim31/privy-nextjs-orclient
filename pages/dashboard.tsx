@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getAccessToken, usePrivy, useWallets } from "@privy-io/react-auth";
 import Head from "next/head";
 import { hexlify, randomBytes } from "ethers";
-import { useOrclient } from "@ordao/privy-react-orclient";
+import { useOrclient, deployments } from "@ordao/privy-react-orclient";
 
 async function verifyToken() {
   const url = "/api/verify";
@@ -61,7 +61,7 @@ export default function DashboardPage() {
   }, [wallet]);
 
   const orclient = useOrclient(
-    "op-sepolia",
+    deployments["op-sepolia"],
     userWallet,
     {
       consoleConfig: { enabled: true, docsOrigin: "https://orclient-docs.frapps.xyz/" },
