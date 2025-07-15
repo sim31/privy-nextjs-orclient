@@ -61,15 +61,8 @@ export default function DashboardPage() {
   }, [wallet]);
 
   const orclient = useOrclient(
-    deployments["op-sepolia"],
+    "ef",
     userWallet,
-    {
-      consoleConfig: { enabled: true, docsOrigin: "https://orclient-docs.frapps.xyz/" },
-      otherConfirms: 1,
-      propConfirms: 1,
-      propSubmitRetries: 4,
-      propResubmitInterval: 3000
-    }
   );
 
   const googleSubject = user?.google?.subject || null;
